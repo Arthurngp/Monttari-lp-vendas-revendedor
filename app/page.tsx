@@ -7,10 +7,10 @@ import Image from "next/image"
 export default function MonttariLanding() {
   const [formData, setFormData] = useState({
     nome: "",
-    email: "",
+    whatsapp: "",
     cnpj: "",
-    telefone: "",
-    orcamento: "",
+    cidade: "",
+    estado: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
@@ -21,10 +21,7 @@ export default function MonttariLanding() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,47 +29,35 @@ export default function MonttariLanding() {
     setIsSubmitting(true)
     setSubmitMessage("")
 
-    // Basic validation
-    if (!formData.nome || !formData.email || !formData.telefone) {
+    // Validação obrigatória
+    if (!formData.nome || !formData.whatsapp || !formData.cnpj || !formData.cidade || !formData.estado) {
       setSubmitMessage("Por favor, preencha todos os campos obrigatórios.")
       setIsSubmitting(false)
       return
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.email)) {
-      setSubmitMessage("Por favor, insira um email válido.")
-      setIsSubmitting(false)
-      return
-    }
-
     try {
-      const response = await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+      await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
         method: "POST",
         mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nome: formData.nome,
-          email: formData.email,
+          whatsapp: formData.whatsapp,
           cnpj: formData.cnpj,
-          telefone: formData.telefone,
-          orcamento: formData.orcamento,
+          cidade: formData.cidade,
+          estado: formData.estado,
           timestamp: new Date().toLocaleString("pt-BR"),
         }),
       })
 
-      // Since we're using no-cors mode, we can't read the response
-      // but the request will be sent successfully
-      setSubmitMessage("Obrigado! Entraremos em contato em breve.")
+      setSubmitMessage("Cadastro enviado! Nossa equipe entrará em contato em breve.")
       setFormData({
         nome: "",
-        email: "",
+        whatsapp: "",
         cnpj: "",
-        telefone: "",
-        orcamento: "",
+        cidade: "",
+        estado: "",
       })
     } catch (error) {
       console.error("Erro ao enviar formulário:", error)
@@ -131,10 +116,9 @@ export default function MonttariLanding() {
 
                 {/* Contact Form */}
                 <form id="contact-form" onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 max-w-md">
+                  {/* Nome */}
                   <div>
-                    <label htmlFor="nome" className="sr-only">
-                      Nome completo
-                    </label>
+                    <label htmlFor="nome" className="sr-only">Nome completo</label>
                     <input
                       type="text"
                       id="nome"
@@ -147,70 +131,79 @@ export default function MonttariLanding() {
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
                     />
                   </div>
+
+                  {/* WhatsApp */}
                   <div>
-                    <label htmlFor="email" className="sr-only">
-                      Email
-                    </label>
+                    <label htmlFor="whatsapp" className="sr-only">WhatsApp</label>
                     <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
+                      type="tel"
+                      id="whatsapp"
+                      name="whatsapp"
+                      value={formData.whatsapp}
                       onChange={handleInputChange}
-                      placeholder="E-mail *"
+                      placeholder="WhatsApp *"
                       required
                       aria-required="true"
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
                     />
                   </div>
+
+                  {/* CNPJ */}
                   <div>
-                    <label htmlFor="cnpj" className="sr-only">
-                      CNPJ
-                    </label>
+                    <label htmlFor="cnpj" className="sr-only">CNPJ</label>
                     <input
                       type="text"
                       id="cnpj"
                       name="cnpj"
                       value={formData.cnpj}
                       onChange={handleInputChange}
-                      placeholder="CNPJ"
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="telefone" className="sr-only">
-                      Telefone
-                    </label>
-                    <input
-                      type="tel"
-                      id="telefone"
-                      name="telefone"
-                      value={formData.telefone}
-                      onChange={handleInputChange}
-                      placeholder="Telefone *"
+                      placeholder="CNPJ *"
                       required
                       aria-required="true"
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
                     />
                   </div>
+
+                  {/* Cidade */}
                   <div>
-                    <label htmlFor="orcamento" className="sr-only">
-                      Perfil de revenda
-                    </label>
-                    <select
-                      id="orcamento"
-                      name="orcamento"
-                      value={formData.orcamento}
+                    <label htmlFor="cidade" className="sr-only">Cidade</label>
+                    <input
+                      type="text"
+                      id="cidade"
+                      name="cidade"
+                      value={formData.cidade}
                       onChange={handleInputChange}
+                      placeholder="Cidade *"
+                      required
+                      aria-required="true"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
+                    />
+                  </div>
+
+                  {/* Estado */}
+                  <div>
+                    <label htmlFor="estado" className="sr-only">Estado</label>
+                    <select
+                      id="estado"
+                      name="estado"
+                      value={formData.estado}
+                      onChange={handleInputChange}
+                      required
+                      aria-required="true"
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
                     >
-                      <option value="">Selecione seu perfil de revenda:</option>
-                      <option value="representante">Representante comercial</option>
-                      <option value="distribuidor">Distribuidor / atacado</option>
-                      <option value="loja-fisica">Loja física de mobiliário comercial</option>
-                      <option value="ecommerce">E-commerce / marketplace</option>
-                      <option value="projetista">Projetista / arquiteto comercial</option>
-                      <option value="outro">Outro</option>
+                      <option value="">Selecione o estado *</option>
+                      <option value="AL">Alagoas</option>
+                      <option value="BA">Bahia</option>
+                      <option value="CE">Ceará</option>
+                      <option value="MA">Maranhão</option>
+                      <option value="PA">Pará</option>
+                      <option value="PB">Paraíba</option>
+                      <option value="PE">Pernambuco</option>
+                      <option value="PI">Piauí</option>
+                      <option value="RN">Rio Grande do Norte</option>
+                      <option value="SE">Sergipe</option>
+                      <option value="outros">Outros estados</option>
                     </select>
                   </div>
 
