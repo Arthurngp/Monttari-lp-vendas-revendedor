@@ -8,7 +8,9 @@ export default function MonttariLanding() {
   const [formData, setFormData] = useState({
     nome: "",
     whatsapp: "",
+    tipo: "" as "" | "revendedor" | "representante",
     cnpj: "",
+    cpf: "",
     cidade: "",
     estado: "",
   })
@@ -21,7 +23,11 @@ export default function MonttariLanding() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData((prev) => {
+      const next = { ...prev, [name]: value }
+      if (name === "tipo") { next.cnpj = ""; next.cpf = "" }
+      return next
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,8 +36,18 @@ export default function MonttariLanding() {
     setSubmitMessage("")
 
     // Validação obrigatória
-    if (!formData.nome || !formData.whatsapp || !formData.cnpj || !formData.cidade || !formData.estado) {
+    if (!formData.nome || !formData.whatsapp || !formData.tipo || !formData.cidade || !formData.estado) {
       setSubmitMessage("Por favor, preencha todos os campos obrigatórios.")
+      setIsSubmitting(false)
+      return
+    }
+    if (formData.tipo === "revendedor" && !formData.cnpj) {
+      setSubmitMessage("Por favor, informe o CNPJ.")
+      setIsSubmitting(false)
+      return
+    }
+    if (formData.tipo === "representante" && !formData.cpf) {
+      setSubmitMessage("Por favor, informe o CPF.")
       setIsSubmitting(false)
       return
     }
@@ -44,7 +60,8 @@ export default function MonttariLanding() {
         body: JSON.stringify({
           nome: formData.nome,
           whatsapp: formData.whatsapp,
-          cnpj: formData.cnpj,
+          tipo: formData.tipo,
+          documento: formData.tipo === "revendedor" ? formData.cnpj : formData.cpf,
           cidade: formData.cidade,
           estado: formData.estado,
           timestamp: new Date().toLocaleString("pt-BR"),
@@ -55,7 +72,9 @@ export default function MonttariLanding() {
       setFormData({
         nome: "",
         whatsapp: "",
+        tipo: "",
         cnpj: "",
+        cpf: "",
         cidade: "",
         estado: "",
       })
@@ -115,58 +134,99 @@ export default function MonttariLanding() {
                 </div>
 
                 {/* Contact Form */}
-                <form id="contact-form" onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 max-w-md">
+                <form
+                  id="contact-form"
+                  onSubmit={handleSubmit}
+                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-5 sm:p-6 space-y-3 max-w-md shadow-2xl"
+                >
+                  <p className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider mb-1">
+                    Cadastro de revendedor
+                  </p>
+
                   {/* Nome */}
-                  <div>
-                    <label htmlFor="nome" className="sr-only">Nome completo</label>
+                  <div className="relative">
                     <input
                       type="text"
                       id="nome"
                       name="nome"
                       value={formData.nome}
                       onChange={handleInputChange}
-                      placeholder="Nome *"
+                      placeholder="Nome completo *"
                       required
                       aria-required="true"
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
+                      className="w-full px-4 py-3 text-sm rounded-lg bg-white/95 text-gray-800 placeholder-gray-400 border border-white/60 focus:outline-none focus:ring-2 focus:ring-[#e9672d] focus:border-transparent transition-all duration-200 shadow-sm"
                     />
                   </div>
 
                   {/* WhatsApp */}
-                  <div>
-                    <label htmlFor="whatsapp" className="sr-only">WhatsApp</label>
+                  <div className="relative">
                     <input
                       type="tel"
                       id="whatsapp"
                       name="whatsapp"
                       value={formData.whatsapp}
                       onChange={handleInputChange}
-                      placeholder="WhatsApp *"
+                      placeholder="WhatsApp (com DDD) *"
                       required
                       aria-required="true"
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
+                      className="w-full px-4 py-3 text-sm rounded-lg bg-white/95 text-gray-800 placeholder-gray-400 border border-white/60 focus:outline-none focus:ring-2 focus:ring-[#e9672d] focus:border-transparent transition-all duration-200 shadow-sm"
                     />
                   </div>
 
-                  {/* CNPJ */}
-                  <div>
-                    <label htmlFor="cnpj" className="sr-only">CNPJ</label>
-                    <input
-                      type="text"
-                      id="cnpj"
-                      name="cnpj"
-                      value={formData.cnpj}
+                  {/* Tipo */}
+                  <div className="relative">
+                    <select
+                      id="tipo"
+                      name="tipo"
+                      value={formData.tipo}
                       onChange={handleInputChange}
-                      placeholder="CNPJ *"
                       required
                       aria-required="true"
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
-                    />
+                      className="w-full px-4 py-3 text-sm rounded-lg bg-white/95 border border-white/60 focus:outline-none focus:ring-2 focus:ring-[#e9672d] focus:border-transparent transition-all duration-200 shadow-sm appearance-none cursor-pointer"
+                      style={{ color: formData.tipo ? "#1f2937" : "#9ca3af" }}
+                    >
+                      <option value="">Você é revendedor ou representante? *</option>
+                      <option value="revendedor">Revendedor</option>
+                      <option value="representante">Representante</option>
+                    </select>
                   </div>
 
-                  {/* Cidade */}
-                  <div>
-                    <label htmlFor="cidade" className="sr-only">Cidade</label>
+                  {/* CNPJ — revendedor */}
+                  {formData.tipo === "revendedor" && (
+                    <div className="relative animate-in fade-in slide-in-from-top-1 duration-200">
+                      <input
+                        type="text"
+                        id="cnpj"
+                        name="cnpj"
+                        value={formData.cnpj}
+                        onChange={handleInputChange}
+                        placeholder="CNPJ *"
+                        required
+                        aria-required="true"
+                        className="w-full px-4 py-3 text-sm rounded-lg bg-white/95 text-gray-800 placeholder-gray-400 border border-[#e9672d]/60 focus:outline-none focus:ring-2 focus:ring-[#e9672d] focus:border-transparent transition-all duration-200 shadow-sm"
+                      />
+                    </div>
+                  )}
+
+                  {/* CPF — representante */}
+                  {formData.tipo === "representante" && (
+                    <div className="relative animate-in fade-in slide-in-from-top-1 duration-200">
+                      <input
+                        type="text"
+                        id="cpf"
+                        name="cpf"
+                        value={formData.cpf}
+                        onChange={handleInputChange}
+                        placeholder="CPF *"
+                        required
+                        aria-required="true"
+                        className="w-full px-4 py-3 text-sm rounded-lg bg-white/95 text-gray-800 placeholder-gray-400 border border-[#e9672d]/60 focus:outline-none focus:ring-2 focus:ring-[#e9672d] focus:border-transparent transition-all duration-200 shadow-sm"
+                      />
+                    </div>
+                  )}
+
+                  {/* Cidade + Estado em linha */}
+                  <div className="grid grid-cols-2 gap-3">
                     <input
                       type="text"
                       id="cidade"
@@ -176,13 +236,8 @@ export default function MonttariLanding() {
                       placeholder="Cidade *"
                       required
                       aria-required="true"
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-800 placeholder-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
+                      className="w-full px-4 py-3 text-sm rounded-lg bg-white/95 text-gray-800 placeholder-gray-400 border border-white/60 focus:outline-none focus:ring-2 focus:ring-[#e9672d] focus:border-transparent transition-all duration-200 shadow-sm"
                     />
-                  </div>
-
-                  {/* Estado */}
-                  <div>
-                    <label htmlFor="estado" className="sr-only">Estado</label>
                     <select
                       id="estado"
                       name="estado"
@@ -190,9 +245,10 @@ export default function MonttariLanding() {
                       onChange={handleInputChange}
                       required
                       aria-required="true"
-                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded bg-white text-gray-500 border-0 focus:outline-none focus:ring-2 focus:ring-[#e9672d]"
+                      className="w-full px-3 py-3 text-sm rounded-lg bg-white/95 border border-white/60 focus:outline-none focus:ring-2 focus:ring-[#e9672d] focus:border-transparent transition-all duration-200 shadow-sm appearance-none cursor-pointer"
+                      style={{ color: formData.estado ? "#1f2937" : "#9ca3af" }}
                     >
-                      <option value="">Selecione o estado *</option>
+                      <option value="">Estado *</option>
                       <option value="AL">Alagoas</option>
                       <option value="BA">Bahia</option>
                       <option value="CE">Ceará</option>
@@ -203,13 +259,17 @@ export default function MonttariLanding() {
                       <option value="PI">Piauí</option>
                       <option value="RN">Rio Grande do Norte</option>
                       <option value="SE">Sergipe</option>
-                      <option value="outros">Outros estados</option>
+                      <option value="outros">Outros</option>
                     </select>
                   </div>
 
                   {submitMessage && (
                     <div
-                      className={`text-sm p-2 rounded ${submitMessage.includes("Obrigado") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                      className={`text-sm px-4 py-3 rounded-lg font-medium ${
+                        submitMessage.includes("Cadastro")
+                          ? "bg-green-500/20 text-green-100 border border-green-400/30"
+                          : "bg-red-500/20 text-red-100 border border-red-400/30"
+                      }`}
                     >
                       {submitMessage}
                     </div>
@@ -218,9 +278,9 @@ export default function MonttariLanding() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-[#e9672d] hover:bg-[#d55a26] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded transition-colors duration-200"
+                    className="w-full bg-[#e9672d] hover:bg-[#d55a26] active:scale-[0.98] disabled:bg-gray-500 disabled:cursor-not-allowed text-white font-bold py-3.5 px-6 text-sm sm:text-base rounded-lg transition-all duration-200 shadow-lg shadow-orange-900/40 mt-1"
                   >
-                    {isSubmitting ? "Enviando..." : "Quero ser um revendedor"}
+                    {isSubmitting ? "Enviando..." : "Quero ser revendedor →"}
                   </button>
                 </form>
               </div>
