@@ -17,6 +17,74 @@ export default function MonttariLanding() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
 
+  const reviews = [
+    {
+      name: "Idealize Aju",
+      stars: 5,
+      text: "Excelente parceiro! Vasta variedade de produtos, acabamento impecável e um ótimo prazo de entrega... Super recomendado, equipe empenhada em sempre oferecer o melhor produto/serviço para o cliente.",
+      initials: "IA",
+    },
+    {
+      name: "Charles Mendonça",
+      stars: 5,
+      text: "Atendimento e produtos de alta qualidade.",
+      initials: "CM",
+    },
+    {
+      name: "Lucas Bernardo",
+      stars: 5,
+      text: "Excelente localização e atendimento maravilhoso.",
+      initials: "LB",
+    },
+    {
+      name: "David Maciel",
+      stars: 5,
+      text: "Muito boa.",
+      initials: "DM",
+    },
+    {
+      name: "Vendas Nordeste",
+      stars: 5,
+      text: "Excelente empresa.",
+      initials: "VN",
+    },
+  ]
+
+  // Carrossel infinito: [clone-último, ...originais, clone-primeiro]
+  const infiniteReviews = [reviews[reviews.length - 1], ...reviews, reviews[0]]
+  const [trackIndex, setTrackIndex] = useState(1) // começa no primeiro card real
+  const [animated, setAnimated] = useState(true)
+
+  const realIndex = ((trackIndex - 1) % reviews.length + reviews.length) % reviews.length
+
+  const prevReview = () => {
+    setAnimated(true)
+    setTrackIndex((i) => i - 1)
+  }
+
+  const nextReview = () => {
+    setAnimated(true)
+    setTrackIndex((i) => i + 1)
+  }
+
+  const goToReview = (i: number) => {
+    setAnimated(true)
+    setTrackIndex(i + 1)
+  }
+
+  const handleTransitionEnd = () => {
+    // Chegou no clone do último → salta para o real
+    if (trackIndex === 0) {
+      setAnimated(false)
+      setTrackIndex(reviews.length)
+    }
+    // Chegou no clone do primeiro → salta para o real
+    if (trackIndex === reviews.length + 1) {
+      setAnimated(false)
+      setTrackIndex(1)
+    }
+  }
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -89,47 +157,33 @@ export default function MonttariLanding() {
   return (
     <div className="min-h-screen">
       {/* First Section - Hero */}
-      <div className="min-h-screen relative overflow-hidden">
+      <div className="relative overflow-hidden sm:min-h-screen">
         <div className="absolute inset-0">
           <Image
             src="/warehouse-industrial-bg.png"
             alt="Warehouse background"
             fill
             priority
-            className="object-cover"
+            className="object-cover object-center"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-black/30"></div>
+          <div className="absolute inset-0 bg-black/50 sm:bg-black/30"></div>
         </div>
 
         {/* Content */}
-        <div className="relative z-10 min-h-screen flex items-center pr-[7px] pb-[39px]">
+        <div className="relative z-10 sm:min-h-screen sm:flex sm:items-center pt-12 pb-10 sm:pb-[39px]">
           <div className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
               {/* Left Content */}
-              <div className="text-white space-y-6 lg:space-y-8">
+              <div className="text-white space-y-5 lg:space-y-8">
                 <div>
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">monttari.</h1>
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 lg:mb-6">monttari.</h1>
                   <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-3 lg:mb-4 leading-tight">
-                    Seja um revendedor
-                    <br />
-                    oficial Monttari e
-                    <br />
-                    venda gôndolas direto
-                    <br />
-                    da fábrica!
+                    Seja um revendedor oficial Monttari e venda gôndolas direto da fábrica!
                   </h2>
-                  <p className="text-base sm:text-lg leading-relaxed">
-                    O programa de revenda ideal para quem
-                    <br className="hidden sm:block" />
-                    quer ampliar o catálogo, ganhar margens
-                    <br className="hidden sm:block" />
-                    atrativas e contar com{" "}
-                    <strong>
-                      o respaldo de uma
-                      <br className="hidden sm:block" />
-                      fábrica com 22 anos de mercado!
-                    </strong>
+                  <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-white/90">
+                    O programa de revenda ideal para quem quer ampliar o catálogo, ganhar margens atrativas e contar com{" "}
+                    <strong className="text-white">o respaldo de uma fábrica com 22 anos de mercado!</strong>
                   </p>
                 </div>
 
@@ -137,7 +191,7 @@ export default function MonttariLanding() {
                 <form
                   id="contact-form"
                   onSubmit={handleSubmit}
-                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-5 sm:p-6 space-y-3 max-w-md shadow-2xl"
+                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 sm:p-6 space-y-3 w-full max-w-md shadow-2xl"
                 >
                   <p className="text-white/80 text-xs sm:text-sm font-medium uppercase tracking-wider mb-1">
                     Cadastro de revendedor
@@ -185,7 +239,7 @@ export default function MonttariLanding() {
                       className="w-full px-4 py-3 text-sm rounded-lg bg-white/95 border border-white/60 focus:outline-none focus:ring-2 focus:ring-[#e9672d] focus:border-transparent transition-all duration-200 shadow-sm appearance-none cursor-pointer"
                       style={{ color: formData.tipo ? "#1f2937" : "#9ca3af" }}
                     >
-                      <option value="">Você é revendedor ou representante? *</option>
+                      <option value="">Revendedor ou representante? *</option>
                       <option value="revendedor">Revendedor</option>
                       <option value="representante">Representante</option>
                     </select>
@@ -285,8 +339,8 @@ export default function MonttariLanding() {
                 </form>
               </div>
 
-              {/* Right Content - Circular Images */}
-              <div className="relative flex justify-center lg:justify-end mt-8 lg:mt-0">
+              {/* Right Content - Circular Images (hidden on mobile) */}
+              <div className="hidden sm:flex relative justify-center lg:justify-end mt-8 lg:mt-0">
                 <div className="relative">
                   <div className="w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full border-2 sm:border-4 border-white overflow-hidden shadow-2xl">
                     <Image
@@ -657,38 +711,87 @@ export default function MonttariLanding() {
           </div>
 
           <div className="text-center">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#e9672d] mb-8 sm:mb-12 text-balance">
-              QUEM JÁ REVENDE MONTTARI RECOMENDA!
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#e9672d] mb-2 sm:mb-4 text-balance">
+              O QUE DIZEM SOBRE A MONTTARI
             </h2>
+            <p className="text-gray-500 text-sm mb-8 sm:mb-12 flex items-center justify-center gap-1">
+              <span className="text-yellow-400 text-base">★★★★★</span>
+              Avaliações reais do Google
+            </p>
 
-            <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
-              <div className="bg-[#e9672d] text-white rounded-lg p-6 sm:p-8 text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full mx-auto mb-3 sm:mb-4 overflow-hidden">
-                  <Image
-                    src="/professional-man-smiling.png"
-                    alt="José"
-                    width={64}
-                    height={64}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
+            {/* Carrossel infinito com peek */}
+            <div className="relative">
+              <div className="overflow-hidden">
+                <div
+                  className="flex gap-4"
+                  onTransitionEnd={handleTransitionEnd}
+                  style={{
+                    transform: `translateX(calc(7.5% - ${trackIndex} * (85% + 16px)))`,
+                    transition: animated ? "transform 500ms ease-in-out" : "none",
+                  }}
+                >
+                  {infiniteReviews.map((review, i) => {
+                    const isActive = i === trackIndex
+                    return (
+                      <div
+                        key={i}
+                        className="flex-shrink-0 w-[85%]"
+                        style={{
+                          opacity: isActive ? 1 : 0.45,
+                          transform: isActive ? "scale(1)" : "scale(0.95)",
+                          transition: "opacity 0.4s ease, transform 0.5s ease",
+                        }}
+                      >
+                        <div className="bg-[#e9672d] text-white rounded-2xl p-6 sm:p-8 text-center shadow-xl flex flex-col items-center">
+                          <div className="w-12 h-12 bg-white rounded-full mb-4 flex items-center justify-center shadow">
+                            <span className="text-[#e9672d] font-bold text-sm">{review.initials}</span>
+                          </div>
+                          <div className="flex justify-center gap-0.5 mb-3 text-yellow-300 text-lg">
+                            {"★".repeat(review.stars)}
+                          </div>
+                          <p className="text-sm sm:text-base leading-relaxed mb-4 italic">"{review.text}"</p>
+                          <p className="font-bold text-sm">{review.name}</p>
+                          <p className="text-xs opacity-70 mt-0.5">Google My Business</p>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2">José</h3>
-                <p className="text-xs sm:text-sm mb-3 sm:mb-4 opacity-90">Representante comercial</p>
-                <p className="text-xs sm:text-sm leading-relaxed">
-                  "Em 6 meses revendendo Monttari, dobrei minha carteira de clientes e aumentei minha margem em 30%."
-                </p>
               </div>
 
-              <div className="bg-[#e9672d] text-white rounded-lg p-6 sm:p-8 text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-                  <span className="text-[#e9672d] font-bold text-xs sm:text-sm">RedeMed</span>
+              {/* Controles */}
+              <div className="flex items-center justify-center gap-4 mt-6">
+                <button
+                  onClick={prevReview}
+                  aria-label="Anterior"
+                  className="w-9 h-9 rounded-full border-2 border-[#e9672d] text-[#e9672d] flex items-center justify-center hover:bg-[#e9672d] hover:text-white transition-colors duration-200 text-xl font-bold"
+                >
+                  ‹
+                </button>
+
+                <div className="flex gap-2 items-center">
+                  {reviews.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goToReview(i)}
+                      aria-label={`Review ${i + 1}`}
+                      className="rounded-full transition-all duration-300"
+                      style={{
+                        width: i === realIndex ? "20px" : "8px",
+                        height: "8px",
+                        backgroundColor: i === realIndex ? "#e9672d" : "#d1d5db",
+                      }}
+                    />
+                  ))}
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2">RedeMed</h3>
-                <p className="text-xs sm:text-sm mb-3 sm:mb-4 opacity-90">Distribuidor parceiro</p>
-                <p className="text-xs sm:text-sm leading-relaxed">
-                  "O suporte comercial e os prazos da fábrica fazem a diferença na hora de fechar grandes contratos."
-                </p>
+
+                <button
+                  onClick={nextReview}
+                  aria-label="Próximo"
+                  className="w-9 h-9 rounded-full border-2 border-[#e9672d] text-[#e9672d] flex items-center justify-center hover:bg-[#e9672d] hover:text-white transition-colors duration-200 text-xl font-bold"
+                >
+                  ›
+                </button>
               </div>
             </div>
           </div>
